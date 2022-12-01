@@ -1,0 +1,582 @@
+<html>
+	<meta charset="utf-8">
+	<head>
+		<style>
+		*
+		{
+			font-family: "Comic Sans MS", "Comic Sans", cursive;
+			color: blue;
+		}
+		button
+		{
+			text-align: center;
+		}
+		input
+		{
+			text-align: center;
+		}
+		table, th, td
+		{
+			border: 3px solid darkblue;
+			border-collapse: collapse;
+		}
+		</style>
+	</head>
+	<body style="background-color: lightblue">
+		<div id="avrora" style="font-size: 48pt">AvRoRa rEmAsTeReD</div>
+		<div id="authSelection">
+			<div><button onClick="authStep1(0)">Администратор</button></div>
+			<div><button onClick="authStep1(1)">Преподаватель</button></div>
+			<div><button onClick="authStep1(2)">Студент</button></div>
+		</div>
+		<div id="authInput" style="display: none">
+			<div><input id="authName" size="50" placeholder="Полные Фамилия, Имя, Отчество"></div>
+			<div><input id="authPass" size="50" placeholder="Десятизначный пароль"></div>
+			<div><button onClick="authStep2()">Войти</button><button onClick="authReset()">Назад</button></div>
+		</div>
+		<div>
+			<div class="options" style="display: none">
+				<div><button onClick="authReset()">Выход</button></div>
+				<div><button onClick="insertCourse()">Добавить новый курс (и уникальную дисциплину к нему)</button></div>
+				<div>
+					<input id="C_name_course" size="50" placeholder="Название курса">
+					<input id="C_passingScore_course" size="30" placeholder="Проходной балл курса">
+					<input id="C_name_subject" size="50" placeholder="Название дисциплины"><input id="C_passingScore_subject" size="30" placeholder="Проходной балл дисциплины">
+				</div>
+				<div><button onClick="selectCourse()">Вывести таблицу курсов с фильтром по шифру и названию курса и сортировкой по проходному баллу</button></div>
+				<div>
+					<input id="R_id_course" size="50" placeholder="Шифр курса (опционально)">
+					<input id="R_name_course" size="50" placeholder="Часть названия курса (опционально)">
+					<input type="radio" name="R_order_course" id="R_order_course0" value="" checked><label for="R_order_course0">Без сортировки</label>
+					<input type="radio" name="R_order_course" id="R_order_course1" value=" ORDER BY passingScore_course"><label for="R_order_course1">По возрастанию</label>
+					<input type="radio" name="R_order_course" id="R_order_course2" value=" ORDER BY passingScore_course DESC"><label for="R_order_course2">По убыванию</label>
+				</div>
+				<div><button onClick="updateCourse()">Изменить название и/или проходной балл курса по шифру</button></div>
+				<div>
+					<input id="U_id_course" size="50" placeholder="Шифр курса">
+					<input id="U_name_course" size="50" placeholder="Название курса (опционально)">
+					<input id="U_passingScore_course" size="50" placeholder="Проходной балл курса (опционально)">
+				</div>
+				<div><button onClick="deleteCourse()">Удалить курс по шифру (также удалит всех студентов и преподавателей, уникальные дисциплины и задания курса)</button></div>
+				<div>
+					<input id="D_id_course" size="50" placeholder="Шифр курса">
+				</div>
+				<div><button onClick="insertSubject()">Добавить новую дисциплину</button></div>
+				<div>
+					<input id="C1_name_subject" size="50" placeholder="Название дисциплины">
+				</div>
+				<div><button onClick="selectSubject()">Вывести таблицу дисциплин с фильтром по шифру и названию дисциплины</button></div>
+				<div>
+					<input id="R_id_subject" size="50" placeholder="Шифр дисциплины (опционально)">
+					<input id="R_name_subject" size="50" placeholder="Часть названия дисциплины (опционально)">
+				</div>
+				<div><button onClick="updateSubject()">Изменить название дисциплины по шифру</button></div>
+				<div>
+					<input id="U_id_subject" size="50" placeholder="Шифр дисциплины">
+					<input id="U_name_subject" size="50" placeholder="Название дисциплины (опционально)">
+				</div>
+				<div><button onClick="deleteSubject()">Удалить дисциплину по шифру (также удалит все задания дисциплины и ответы на них)</button></div>
+				<div>
+					<input id="D_id_subject" size="50" placeholder="Шифр дисциплины">
+				</div>
+				<div><button onClick="insertCourseToSubjects()">Прикрепить дисциплину к курсу по шифрам и проходному баллу</button></div>
+				<div>
+					<input id="C2_id_course" size="50" placeholder="Шифр курса">
+					<input id="C2_id_subject" size="50" placeholder="Шифр дисциплины">
+					<input id="C2_passingScore_subject" size="30" placeholder="Проходной балл дисциплины">
+				</div>
+				<div><button onClick="selectCourseToSubjects()">Вывести таблицу прикреплённых к курсам дисциплин c фильтром по шифрам и названиям и сортировкой по баллу</button></div>
+				<div>
+					<input id="R2_id_course" size="50" placeholder="Шифр курса (опционально)">
+					<input id="R2_name_course" size="50" placeholder="Часть названия курса (опционально)">
+					<input id="R2_id_subject" size="50" placeholder="Шифр дисциплины (опционально)">
+					<input id="R2_name_subject" size="50" placeholder="Часть названия дисциплины (опционально)">
+					<input type="radio" name="R2_order_subject" id="R2_order_subject0" value="" checked><label for="R2_order_subject0">Без сортировки</label>
+					<input type="radio" name="R2_order_subject" id="R2_order_subject1" value=" ORDER BY passingScore_subject"><label for="R2_order_subject1">По возрастанию</label>
+					<input type="radio" name="R2_order_subject" id="R2_order_subject2" value=" ORDER BY passingScore_subject DESC"><label for="R2_order_subject2">По убыванию</label>
+				</div>
+				<div><button onClick="updateCourseToSubjects()">Изменить проходной балл дисциплины по шифрам</button></div>
+				<div>
+					<input id="U2_id_course" size="50" placeholder="Шифр курса">
+					<input id="U2_id_subject" size="50" placeholder="Шифр дисциплины">
+					<input id="U2_passingScore_subject" size="50" placeholder="Проходной балл дисциплины">
+				</div>
+				<div><button onClick="deleteCourseToSubjects()">Удалить связку курса и дисциплины по шифру</button></div>
+				<div>
+					<input id="D_id_course" size="50" placeholder="Шифр курса">
+					<input id="D_id_subject" size="50" placeholder="Шифр дисциплины">
+				</div>
+				<div><button onClick="insertTeacher()">Добавить преподавателя по ФИО и шифру курса</button></div>
+				<div>
+					<input id="C3_id_course" size="50" placeholder="Шифр курса">
+					<input id="C3_name_teacher" size="50" placeholder="Полные Фамилия, Имя, Отчество">
+				</div>
+				<div><button onClick="selectTeacher()">Вывести таблицу преподавателей c фильтром по шифрам и именам сотрудников, шифрам и названиям курсов</button></div>			
+				<div>
+					<input id="R3_id_teacher" size="50" placeholder="Шифр сотрудника (опционально)">
+					<input id="R3_name_teacher" size="50" placeholder="Часть ФИО сотрудника (опционально)">
+					<input id="R3_id_course" size="50" placeholder="Шифр курса (опционально)">
+					<input id="R3_name_course" size="50" placeholder="Часть названия курса (опционально)">
+				</div>
+				<div><button onClick="updateTeacher()">Изменить ФИО и/или курс сотрудника по шифру</button></div>			
+				<div>
+					<input id="U3_id_teacher" size="50" placeholder="Шифр сотрудника">
+					<input id="U3_name_teacher" size="50" placeholder="Часть ФИО сотрудника (опционально)">
+					<input id="U3_id_course" size="50" placeholder="Шифр курса (опционально)">
+				</div>
+				<div><button onClick="deleteTeacher()">Удалить сотрудника по шифру</button></div>			
+				<div>
+					<input id="D3_id_teacher" size="50" placeholder="Шифр сотрудника">
+				</div>
+				<div><button onClick="insertStudent()">Добавить студента по ФИО и шифру курса</button></div>
+				<div>
+					<input id="C4_id_course" size="50" placeholder="Шифр курса">
+					<input id="C4_name_student" size="50" placeholder="Полные Фамилия, Имя, Отчество">
+				</div>
+				<div><button onClick="selectStudent()">Вывести таблицу студентов в соответствие с курсом</button></div>		
+				<div><button onClick="updateStudent()">Изменить ФИО студента по шифру</button></div>			
+				<div>
+					<input id="U3_id_student" size="50" placeholder="Шифр студента">
+					<input id="U3_name_student" size="50" placeholder="Часть ФИО студента (опционально)">
+				</div>
+				<div><button onClick="deleteStudent()">Удалить студента по шифру</button></div>			
+				<div>
+					<input id="D3_id_student" size="50" placeholder="Шифр студента">
+				</div>
+			</div>
+			<div class="options" style="display: none">
+				<div><button onClick="authReset()">Выход</button></div>
+			</div>
+			<div class="options" style="display: none">
+				<div><button onClick="authReset()">Выход</button></div>
+			</div>
+		</div>
+		<table id="res"></table>
+	</body>
+</html>
+
+<script>
+
+var authSelection = document.getElementById("authSelection");
+var authInput = document.getElementById("authInput");
+var authName = document.getElementById("authName");
+var authPass = document.getElementById("authPass");
+var options = document.getElementsByClassName("options");
+var res = document.getElementById("res");
+var userMode;
+
+function authStep1(number)
+{
+	userMode = number;
+	authSelection.style.display = "none";
+	authInput.style.display = "block";
+}
+
+function authReset()
+{
+	authSelection.style.display = "block";
+	authInput.style.display = "none";
+	for (var option of options)
+		option.style.display = "none";
+}
+
+function authStep2()
+{	
+
+	switch (userMode)
+	{
+		case 0:
+		{
+			var sendQuery = new XMLHttpRequest();
+			sendQuery.onload = function() 
+			{
+				if (this.responseText.length > 9)
+				{
+					authInput.style.display = "none";
+					options[0].style.display = "block";
+					res.innerHTML = "";
+				}
+				else
+					res.innerHTML = "Логин и пароль администратора не совпадают.";
+			}
+			sendQuery.open("GET", "/AVRORA/api.php?query=SELECT * FROM Admins WHERE name_admin = '" + authName.value + "' AND pass_admin = '" + authPass.value + "'");
+			sendQuery.send();
+			break;
+		}
+		case 1:
+		{
+			break;
+		}
+		case 2:
+		{
+			break;
+		}
+	}
+}
+
+var C_name_course = document.getElementById("C_name_course");
+var C_passingScore_course = document.getElementById("C_passingScore_course");
+var C_name_subject = document.getElementById("C_name_subject");
+var C_passingScore_subject = document.getElementById("C_passingScore_subject");
+
+function insertCourse()
+{
+	var sendQuery = new XMLHttpRequest();
+	sendQuery.onload = function() 
+	{
+		if (this.responseText == "S")
+			res.innerHTML = "Создание курса выполнено успешно.";
+		else
+			res.innerHTML = this.responseText;
+	}
+	sendQuery.open("GET", "/AVRORA/api.php?query=CALL ADD_COURSE('" + C_name_course.value + "', " + C_passingScore_course.value + ", '" + C_name_subject.value + "', " + C_passingScore_subject.value + ")");
+	sendQuery.send();	
+}
+
+var R_id_course = document.getElementById("R_id_course");
+var R_name_course = document.getElementById("R_name_course");
+var R_order_course = document.getElementsByName("R_order_course");
+
+function selectCourse()
+{
+	var id = R_id_course.value != "" ? "id_course = " + R_id_course.value : "TRUE";
+	var name = " AND name_course LIKE '%" + R_name_course.value + "%'";
+	var order;
+	for (var ord of R_order_course)
+		if (ord.checked)
+		{
+			order = ord.value;
+			break;
+		}
+	var sendQuery = new XMLHttpRequest();
+	sendQuery.onload = function() 
+	{
+		res.innerHTML = this.responseText;
+	}
+	sendQuery.open("GET", "/AVRORA/api.php?query=SELECT id_course AS 'Шифр', name_course AS 'Название', passingScore_course AS 'Проходной балл' FROM Courses WHERE " + id + name + order);
+	sendQuery.send();	
+}
+
+var U_id_course = document.getElementById("U_id_course");
+var U_name_course = document.getElementById("U_name_course");
+var U_passingScore_course = document.getElementById("U_passingScore_course");
+
+function updateCourse()
+{
+	var name = U_name_course.value != "" ? "'" + U_name_course.value + "'" : "name_course";
+	var passingScore = U_passingScore_course.value != "" ? U_passingScore_course.value : "passingScore_course";
+	var sendQuery = new XMLHttpRequest();
+	sendQuery.onload = function() 
+	{
+		if (this.responseText == "S")
+			res.innerHTML = "Изменение курса выполнено успешно.";
+		else
+			res.innerHTML = this.responseText;
+	}
+	sendQuery.open("GET", "/AVRORA/api.php?query=UPDATE Courses SET name_course = " + name + ", passingScore_course = " + passingScore + " WHERE id_course = " + U_id_course.value);
+	sendQuery.send();	
+}
+
+var D_id_course = document.getElementById("D_id_course");
+
+function deleteCourse()
+{
+	var sendQuery = new XMLHttpRequest();
+	sendQuery.onload = function() 
+	{
+		if (this.responseText == "S")
+			res.innerHTML = "Удаление курса выполнено успешно.";
+		else
+			res.innerHTML = this.responseText;
+	}
+	sendQuery.open("GET", "/AVRORA/api.php?query=CALL DELETE_COURSE(" + D_id_course.value + ")");
+	sendQuery.send();	
+}
+
+var C1_name_subject = document.getElementById("C1_name_subject");
+
+function insertSubject()
+{
+	var sendQuery = new XMLHttpRequest();
+	sendQuery.onload = function() 
+	{
+		if (this.responseText == "S")
+			res.innerHTML = "Создание дисциплины выполнено успешно.";
+		else
+			res.innerHTML = this.responseText;
+	}
+	sendQuery.open("GET", "/AVRORA/api.php?query=INSERT INTO Subjects (name_subject) VALUES ('" + C1_name_subject.value + "')");
+	sendQuery.send();	
+}
+
+var R_id_subject = document.getElementById("R_id_subject");
+var R_name_subject = document.getElementById("R_name_subject");
+
+function selectSubject()
+{
+	var id = R_id_subject.value != "" ? "id_subject = " + R_id_subject.value : "TRUE";
+	var name = " AND name_subject LIKE '%" + R_name_subject.value + "%'";
+	var sendQuery = new XMLHttpRequest();
+	sendQuery.onload = function() 
+	{
+		res.innerHTML = this.responseText;
+	}
+	sendQuery.open("GET", "/AVRORA/api.php?query=SELECT id_subject AS 'Шифр', name_subject AS 'Название' FROM Subjects WHERE " + id + name);
+	sendQuery.send();	
+}
+
+var U_id_subject = document.getElementById("U_id_subject");
+var U_name_subject = document.getElementById("U_name_subject");
+
+function updateSubject()
+{
+	var name = U_name_subject.value != "" ? "'" + U_name_subject.value + "'" : "name_subject";
+	var sendQuery = new XMLHttpRequest();
+	sendQuery.onload = function() 
+	{
+		if (this.responseText == "S")
+			res.innerHTML = "Изменение курса выполнено успешно.";
+		else
+			res.innerHTML = this.responseText;
+	}
+	sendQuery.open("GET", "/AVRORA/api.php?query=UPDATE Subjects SET name_subject = " + name + " WHERE id_subject = " + U_id_subject.value);
+	sendQuery.send();	
+}
+
+var D_id_subject = document.getElementById("D_id_subject");
+
+function deleteSubject()
+{
+	var sendQuery = new XMLHttpRequest();
+	sendQuery.onload = function() 
+	{
+		if (this.responseText == "S")
+			res.innerHTML = "Удаление дисциплины выполнено успешно.";
+		else
+			res.innerHTML = this.responseText;
+	}
+	sendQuery.open("GET", "/AVRORA/api.php?query=DELETE Answers, Tasks, SubjectToTasks, Subjects, CourseToSubjects FROM (CourseToSubjects JOIN Subjects ON CourseToSubjects.id_subject = Subjects.id_subject JOIN SubjectToTasks ON Subjects.id_subject = SubjectToTasks.id_subject JOIN Tasks ON SubjectToTasks.id_task = Tasks.id_task JOIN Answers ON Tasks.id_task = Answers.id_task) WHERE Answers.id_task IN (SELECT id FROM (SELECT id_task AS id FROM SubjectToTasks WHERE id_subject = " + D_id_subject.value + ") as sus)");
+	sendQuery.send();	
+}
+
+var C2_id_course = document.getElementById("C2_id_course");
+var C2_id_subject = document.getElementById("C2_id_subject");
+var C2_passingScore_subject = document.getElementById("C2_passingScore_subject");
+
+function insertCourseToSubjects()
+{
+	var sendQuery1 = new XMLHttpRequest();
+	sendQuery1.onload = function()
+	{
+		if (this.responseText == "S")
+			res.innerHTML = "Связка курса с дисциплиной выполнена успешно.";
+		else
+			res.innerHTML = this.responseText;
+	}
+	sendQuery1.open("GET", "/AVRORA/api.php?query=CALL INSERT_COURSETOSUBJECTS_WRAP(" + C2_id_course.value + ", " + C2_id_subject.value + ", " + C2_passingScore_subject.value + ")");
+	sendQuery1.send();	
+}
+
+var R2_id_course = document.getElementById("R2_id_course");
+var R2_name_course = document.getElementById("R2_name_course");
+var R2_id_subject = document.getElementById("R2_id_subject");
+var R2_name_subject = document.getElementById("R2_name_subject");
+var R2_order_subject = document.getElementsByName("R2_order_subject");
+
+function selectCourseToSubjects()
+{
+	var Cid = R2_id_course.value != "" ? "Courses.id_course = " + R2_id_course.value : "TRUE";
+	var Cname = " AND name_course LIKE '%" + R2_name_course.value + "%'";
+	var Sid = R2_id_subject.value != "" ? " AND Subjects.id_subject = " + R2_id_subject.value : " AND TRUE";
+	var Sname = " AND name_subject LIKE '%" + R2_name_subject.value + "%'";
+	var order;
+	for (var ord of R2_order_subject)
+		if (ord.checked)
+		{
+			order = ord.value;
+			break;
+		}
+	var sendQuery = new XMLHttpRequest();
+	sendQuery.onload = function() 
+	{
+		res.innerHTML = this.responseText;
+	}
+	sendQuery.open("GET", "/AVRORA/api.php?query=SELECT Courses.id_course AS 'Шифр курса', Subjects.id_subject AS 'Шифр дисциплины', name_course AS 'Название курса', name_subject AS 'Название дисциплины', passingScore_subject AS 'Проходной балл' FROM CourseToSubjects JOIN Courses ON CourseToSubjects.id_course = Courses.id_course JOIN Subjects ON CourseToSubjects.id_subject = Subjects.id_subject WHERE " + Cid + Cname + Sid + Sname + order);
+	sendQuery.send();	
+}
+
+var U2_id_course = document.getElementById("U2_id_course");
+var U2_id_subject = document.getElementById("U2_id_subject");
+var U2_passingScore_subject = document.getElementById("U2_passingScore_subject");
+
+function updateCourseToSubjects()
+{
+	var sendQuery = new XMLHttpRequest();
+	sendQuery.onload = function() 
+	{
+		if (this.responseText == "S")
+			res.innerHTML = "Изменение проходного балла выполнено успешно.";
+		else
+			res.innerHTML = this.responseText;
+	}
+	sendQuery.open("GET", "/AVRORA/api.php?query=UPDATE CourseToSubjects SET passingScore_subject = " + U2_passingScore_subject.value + " WHERE id_course = " + U2_id_course.value + " AND id_subject = " + U2_id_subject.value);
+	sendQuery.send();	
+}
+
+var D2_id_course = document.getElementById("U2_id_course");
+var D2_id_subject = document.getElementById("U2_id_subject");
+
+function deleteCourseToSubjects()
+{
+	var sendQuery = new XMLHttpRequest();
+	sendQuery.onload = function() 
+	{
+		if (this.responseText == "S")
+			res.innerHTML = "Удаление связки выполнено успешно.";
+		else
+			res.innerHTML = this.responseText;
+	}
+	sendQuery.open("GET", "/AVRORA/api.php?query=DELETE FROM CourseToSubjects WHERE id_course = " + D2_id_course.value + " AND id_subject = " + D2_id_subject.value);
+	sendQuery.send();	
+}
+
+var C3_id_course = document.getElementById("C3_id_course");
+var C3_name_teacher = document.getElementById("C3_name_teacher");
+
+function insertTeacher()
+{
+	var sendQuery = new XMLHttpRequest();
+	sendQuery.onload = function() 
+	{
+		if (this.responseText == "S")
+			res.innerHTML = "Добавление преподавателя выполнено успешно.";
+		else
+			res.innerHTML = this.responseText;
+	}
+	sendQuery.open("GET", "/AVRORA/api.php?query=INSERT INTO Teachers (id_course, name_teacher, pass_teacher) VALUES (" + C3_id_course.value + ", '" + C3_name_teacher.value + "', SUBSTR(MD5(RAND()), 1, 10))");
+	sendQuery.send();	
+}
+
+var R3_id_teacher = document.getElementById("R3_id_teacher");
+var R3_name_teacher = document.getElementById("R3_name_teacher");
+var R3_id_course = document.getElementById("R3_id_course");
+var R3_name_course = document.getElementById("R3_name_course");
+
+function selectTeacher()
+{
+	var Cid = R3_id_course.value != "" ? "id_course = " + R3_id_course.value : "TRUE";
+	var Tid = R3_id_teacher.value != "" ? " AND id_teacher = " + R3_id_teacher.value : " AND TRUE";
+	var Cname = " AND name_course LIKE '%" + R3_name_course.value + "%'";
+	var Tname = " AND name_teacher LIKE '%" + R3_name_teacher.value + "%'";
+	var order;
+	for (var ord of R_order_course)
+		if (ord.checked)
+		{
+			order = ord.value;
+			break;
+		}
+	var sendQuery = new XMLHttpRequest();
+	sendQuery.onload = function() 
+	{
+		res.innerHTML = this.responseText;
+	}
+	sendQuery.open("GET", "/AVRORA/api.php?query=SELECT Courses.id_course AS 'Шифр курса', id_teacher AS 'Шифр сотрудника', name_course AS 'Название курса', name_teacher AS 'ФИО сотрудника' FROM Courses JOIN Teachers ON Courses.id_course = Teachers.id_course WHERE " + Cid + Tid + Cname + Tname);
+	sendQuery.send();	
+}
+
+var U3_id_teacher = document.getElementById("U3_id_teacher");
+var U3_name_teacher = document.getElementById("U3_name_teacher");
+var U3_id_course = document.getElementById("U3_id_course");
+
+function updateTeacher()
+{
+	var name = U3_name_teacher.value != "" ? "'" + U3_name_teacher.value + "'" : "name_subject";
+	var sendQuery = new XMLHttpRequest();
+	sendQuery.onload = function() 
+	{
+		if (this.responseText == "S")
+			res.innerHTML = "Изменение преподавателя выполнено успешно.";
+		else
+			res.innerHTML = this.responseText;
+	}
+	sendQuery.open("GET", "/AVRORA/api.php?query=UPDATE Teachers SET name_teacher = " + name + ", id_course = " + U3_id_course.value + " WHERE id_teacher = " + U3_id_teacher.value);
+	sendQuery.send();	
+}
+
+var D3_id_teacher = document.getElementById("D3_id_teacher");
+
+function deleteTeacher()
+{
+	var sendQuery = new XMLHttpRequest();
+	sendQuery.onload = function() 
+	{
+		if (this.responseText == "S")
+			res.innerHTML = "Удаление преподавателя выполнено успешно.";
+		else
+			res.innerHTML = this.responseText;
+	}
+	sendQuery.open("GET", "/AVRORA/api.php?query=DELETE FROM Teachers WHERE id_teacher = " + D3_id_teacher.value);
+	sendQuery.send();	
+}
+
+var C4_id_course = document.getElementById("C4_id_course");
+var C4_name_student = document.getElementById("C4_name_student");
+
+function insertStudent()
+{
+	var sendQuery = new XMLHttpRequest();
+	sendQuery.onload = function() 
+	{
+		if (this.responseText == "S")
+			res.innerHTML = "Добавление студента выполнено успешно.";
+		else
+			res.innerHTML = this.responseText;
+	}
+	sendQuery.open("GET", "/AVRORA/api.php?query=CALL ADD_STUDENT(" + C4_id_course.value + ", '" + C4_name_student.value + "', SUBSTR(MD5(RAND()), 1, 10))");
+	sendQuery.send();	
+}
+
+function selectStudent()
+{
+	var sendQuery = new XMLHttpRequest();
+	sendQuery.onload = function() 
+	{
+		res.innerHTML = this.responseText;
+	}
+	sendQuery.open("GET", "/AVRORA/api.php?query=CALL COURSE_STUDENT_VERBOSE()");
+	sendQuery.send();	
+}
+
+var U3_id_course = document.getElementById("U3_id_course");
+var U3_name_student = document.getElementById("U3_name_student");
+
+function updateStudent()
+{
+	var sendQuery = new XMLHttpRequest();
+	sendQuery.onload = function() 
+	{
+		if (this.responseText == "S")
+			res.innerHTML = "Изменение данных студента выполнено успешно.";
+		else
+			res.innerHTML = this.responseText;
+	}
+	sendQuery.open("GET", "/AVRORA/api.php?query=UPDATE Students SET name_student = '" + U3_name_student.value + "' WHERE id_student = " + U3_id_student.value);
+	sendQuery.send();	
+}
+
+var D3_id_student = document.getElementById("D3_id_student");
+
+function deleteStudent()
+{
+	var sendQuery = new XMLHttpRequest();
+	sendQuery.onload = function() 
+	{
+		if (this.responseText == "S")
+			res.innerHTML = "Удаление студента выполнено успешно.";
+		else
+			res.innerHTML = this.responseText;
+	}
+	sendQuery.open("GET", "/AVRORA/api.php?query=DELETE Students, Answers FROM Students JOIN Answers ON Students.id_student = Answers.id_student WHERE Students.id_student = " + D3_id_student.value);
+	sendQuery.send();	
+}
+</script>
